@@ -1,0 +1,13 @@
+[package]
+name = "bcrl-rs"
+version = "0.1.0"
+license = "MIT"
+edition = "2021"
+
+[dependencies]
+bound-stl = "0.1.2"
+byteorder = "1.5.0"
+lde = "0.3.0"
+procfs = "0.16.0"
+signature_scanner = { git = "https://github.com/Sumandora/sigscan-rs", version = "0.1.1" }
+x86_xref = { git = "https://github.com/Sumandora/x86_xref.git", version = "0.1.1" }
