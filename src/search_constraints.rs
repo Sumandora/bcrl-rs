@@ -113,6 +113,12 @@ impl SearchConstraints {
         self
     }
 
+    pub fn also(mut self, predicate: impl Fn(&CachedMap) -> bool + 'static) -> Self {
+        self.predicates.push(Rc::new(predicate));
+
+        self
+    }
+
     pub fn allows_address(&self, address: usize) -> bool {
         self.address_range.0 >= address || self.address_range.1 <= address
     }
