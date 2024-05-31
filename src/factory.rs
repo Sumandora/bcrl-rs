@@ -71,7 +71,8 @@ impl BcrlFactory {
                 let (from, to) =
                     constraints.clamp_address_range((map.get_from_address(), map.get_to_address()));
 
-                let bytes = &map.get_bytes()[from..to];
+                let bytes =
+                    &map.get_bytes()[from - map.get_from_address()..to - map.get_from_address()];
 
                 pattern
                     .all(bytes)

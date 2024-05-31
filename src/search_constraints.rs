@@ -20,8 +20,8 @@ impl SearchConstraints {
         self.address_range
     }
     pub fn clamp_address_range(&self, address_range: (usize, usize)) -> (usize, usize) {
-        let from = address_range.0.max(self.get_address_range().0) - address_range.0;
-        let to = address_range.1.min(self.get_address_range().1) - address_range.0;
+        let from = address_range.0.max(self.get_address_range().0);
+        let to = address_range.1.min(self.get_address_range().1);
 
         (from, to)
     }

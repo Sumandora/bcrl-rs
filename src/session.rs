@@ -38,14 +38,14 @@ impl<'a> Session<'a> {
         })
     }
 
-    /// Finds the previous occurrence of a signature.
+    /// Finds the previous occurrence of a signature. Note, that this won't jump to the next mapping.
     pub fn prev_occurrence(self, signature: Signature, constraints: SearchConstraints) -> Self {
         self.mutate(move |ptr| {
             ptr.prev_occurrence(&signature, &constraints);
         })
     }
 
-    /// Finds the next occurrence of a signature.
+    /// Finds the next occurrence of a signature. Note, that this won't jump to the next mapping.
     pub fn next_occurrence(self, signature: Signature, constraints: SearchConstraints) -> Self {
         self.mutate(move |ptr| {
             ptr.next_occurrence(&signature, &constraints);

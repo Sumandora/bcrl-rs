@@ -183,7 +183,8 @@ impl SafePointer {
                 let (from, to) =
                     constraints.clamp_address_range((map.get_from_address(), map.get_to_address()));
 
-                let bytes = &map.get_bytes()[from..to];
+                let bytes =
+                    &map.get_bytes()[from - map.get_from_address()..to - map.get_from_address()];
 
                 let searcher = RelativeAndAbsoluteFinder::<Endian>::new(
                     map.get_from_address(),
@@ -213,7 +214,8 @@ impl SafePointer {
                 let (from, to) =
                     constraints.clamp_address_range((map.get_from_address(), map.get_to_address()));
 
-                let bytes = &map.get_bytes()[from..to];
+                let bytes =
+                    &map.get_bytes()[from - map.get_from_address()..to - map.get_from_address()];
 
                 let searcher = RelativeFinder::<Endian>::new(
                     map.get_from_address(),
@@ -241,7 +243,8 @@ impl SafePointer {
                 let (from, to) =
                     constraints.clamp_address_range((map.get_from_address(), map.get_to_address()));
 
-                let bytes = &map.get_bytes()[from..to];
+                let bytes =
+                    &map.get_bytes()[from - map.get_from_address()..to - map.get_from_address()];
 
                 let searcher = AbsoluteFinder::<Endian>::new(self.address);
 
