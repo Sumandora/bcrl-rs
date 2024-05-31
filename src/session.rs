@@ -25,30 +25,30 @@ impl<'a> Session<'a> {
     }
 
     /// Dereferences each pointer in the pool.
-    pub fn dereference(self) -> Self {
+    pub fn dereference<Endian: ByteOrder>(self) -> Self {
         self.mutate(move |ptr| {
-            ptr.dereference();
+            ptr.dereference::<Endian>();
         })
     }
 
     /// Dereferences relative addresses.
-    pub fn relative_to_absolute(self) -> Self {
+    pub fn relative_to_absolute<Endian: ByteOrder>(self) -> Self {
         self.mutate(move |ptr| {
-            ptr.relative_to_absolute();
+            ptr.relative_to_absolute::<Endian>();
         })
     }
 
     /// Finds the previous occurrence of a signature.
-    pub fn prev_occurrence(self, signature: Signature) -> Self {
+    pub fn prev_occurrence(self, signature: Signature, constraints: SearchConstraints) -> Self {
         self.mutate(move |ptr| {
-            ptr.prev_occurrence(&signature);
+            ptr.prev_occurrence(&signature, &constraints);
         })
     }
 
     /// Finds the next occurrence of a signature.
-    pub fn next_occurrence(self, signature: Signature) -> Self {
+    pub fn next_occurrence(self, signature: Signature, constraints: SearchConstraints) -> Self {
         self.mutate(move |ptr| {
-            ptr.next_occurrence(&signature);
+            ptr.next_occurrence(&signature, &constraints);
         })
     }
 

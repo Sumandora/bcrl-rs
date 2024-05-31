@@ -53,9 +53,13 @@ impl SafePointer {
         self
     }
 
-    pub fn dereference(&mut self) -> &mut Self {
-        if let Some(new_ptr) = self.read_as::<usize>() {
-            self.address = new_ptr;
+    pub fn dereference<Endian: ByteOrder>(&mut self) -> &mut Self {
+        if let Some(bytes) = self.read(std::mem::size_of::<usize>()) {
+            if cfg!(target_pointer_width = "64") {
+                self.address = Endian::read_u64(bytes) as usize;
+            } else {
+                self.address = Endian::read_u32(bytes) as usize;
+            }
         } else {
             self.invalidate();
         }
@@ -64,14 +68,17 @@ impl SafePointer {
     }
 
     #[cfg(target_pointer_width = "64")]
-    pub fn relative_to_absolute(&mut self) -> &mut Self {
-        if let Some(new_ptr) = self.read_as::<i32>() {
-            use std::cmp::Ordering;
+    pub fn relative_to_absolute<Endian: ByteOrder>(&mut self) -> &mut Self {
+        let i32_size = std::mem::size_of::<i32>();
+        if let Some(offset_bytes) = self.read(i32_size) {
+            let offset = Endian::read_i32(offset_bytes);
 
-            self.address += std::mem::size_of::<i32>();
-            match new_ptr.cmp(&0) {
-                Ordering::Greater => self.address += new_ptr as usize,
-                Ordering::Less => self.address -= new_ptr.unsigned_abs() as usize,
+            self.address += i32_size;
+
+            use std::cmp::Ordering;
+            match offset.cmp(&0) {
+                Ordering::Greater => self.address += offset as usize,
+                Ordering::Less => self.address -= offset.unsigned_abs() as usize,
                 Ordering::Equal => {}
             }
         } else {
@@ -93,34 +100,50 @@ impl SafePointer {
         self
     }
 
-    pub fn prev_occurrence(&mut self, signature: &Signature) -> &mut Self {
+    pub fn prev_occurrence(
+        &mut self,
+        signature: &Signature,
+        constraints: &SearchConstraints,
+    ) -> &mut Self {
         let map = self.maps.find_map(self.address);
         if map.is_none() {
             return self.invalidate();
         }
         let map = map.unwrap();
 
-        if let Some(hit) =
-            signature.prev(&map.get_bytes()[0..self.address - map.get_from_address()])
-        {
-            self.address = hit;
+        if !constraints.allows_map(map) {
+            return self.invalidate();
+        }
+
+        let range = constraints.clamp_address_range((map.get_from_address(), self.address));
+
+        if let Some(hit) = signature.prev(
+            &map.get_bytes()[range.0 - map.get_from_address()..range.1 - map.get_from_address()],
+        ) {
+            self.address -= hit;
             return self;
         }
 
         self.invalidate()
     }
 
-    pub fn next_occurrence(&mut self, signature: &Signature) -> &mut Self {
+    pub fn next_occurrence(
+        &mut self,
+        signature: &Signature,
+        constraints: &SearchConstraints,
+    ) -> &mut Self {
         let map = self.maps.find_map(self.address);
         if map.is_none() {
             return self.invalidate();
         }
         let map = map.unwrap();
 
-        if let Some(hit) =
-            signature.next(&map.get_bytes()[self.address - map.get_from_address()..map.get_size()])
-        {
-            self.address = hit;
+        let range = constraints.clamp_address_range((self.address, map.get_to_address()));
+
+        if let Some(hit) = signature.next(
+            &map.get_bytes()[range.0 - map.get_from_address()..range.1 - map.get_to_address()],
+        ) {
+            self.address += hit;
             return self;
         }
 
@@ -264,16 +287,9 @@ impl SafePointer {
         }
 
         let region = self.maps.find_map(self.address)?;
-        let offset = region.get_to_address() - self.address;
+        let offset = self.address - region.get_from_address();
 
         Some(&region.get_bytes()[offset..offset + length])
-    }
-
-    pub fn read_as<T>(&self) -> Option<T> {
-        let size = std::mem::size_of::<T>();
-        let bytes = self.read(size)?;
-
-        Some(unsafe { std::mem::transmute_copy::<&[u8], T>(&bytes) })
     }
 
     pub fn get_module_name(&self) -> Option<&MMapPath> {

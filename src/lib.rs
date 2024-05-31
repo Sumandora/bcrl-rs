@@ -42,19 +42,19 @@
 //!
 //! // Dereference each pointer
 //! # let session = factory.pointers(Vec::<usize>::new().into_iter());
-//! session.dereference();
+//! session.dereference::<NativeEndian>();
 //!
 //! // Dereference relative addresses
 //! # let session = factory.pointers(Vec::<usize>::new().into_iter());
-//! session.relative_to_absolute();
+//! session.relative_to_absolute::<NativeEndian>();
 //!
 //! // Find the previous occurrence of a signature
 //! # let session = factory.pointers(Vec::<usize>::new().into_iter());
-//! session.prev_occurrence(Signature::string("Hello, world!", false));
+//! session.prev_occurrence(Signature::string("Hello, world!", false), SearchConstraints::everything());
 //!
 //! // Find the next occurrence of a signature
 //! # let session = factory.pointers(Vec::<usize>::new().into_iter());
-//! session.next_occurrence(Signature::string("Hello, world!", false));
+//! session.next_occurrence(Signature::string("Hello, world!", false), SearchConstraints::everything());
 //!
 //! // Skip an instruction
 //! # let session = factory.pointers(Vec::<usize>::new().into_iter());

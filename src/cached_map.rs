@@ -46,7 +46,7 @@ impl CachedMap {
     }
 
     pub fn contains(&self, address: usize) -> bool {
-        self.from_address >= address && address <= self.to_address
+        self.from_address <= address && address < self.to_address
     }
 }
 
