@@ -10,10 +10,6 @@ pub trait FindAddress {
 
 impl FindAddress for CachedMaps {
     fn find_map(&self, address: usize) -> Option<&CachedMap> {
-        if self.is_empty() {
-            return None;
-        }
-
         self.iter().find(|map| map.contains(address))
     }
 }
