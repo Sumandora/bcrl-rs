@@ -97,4 +97,9 @@ impl BcrlFactory {
             pool: Box::new([SafePointer::new(self.maps.clone(), pointer)].into_iter()),
         }
     }
+
+    /// Get the internal caches that BCRL stores. You will likely never need this.
+    pub fn get_cache(&self) -> Rc<CachedMaps> {
+        self.maps.clone()
+    }
 }
