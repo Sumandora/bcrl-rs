@@ -138,10 +138,14 @@ impl SafePointer {
         }
         let map = map.unwrap();
 
+        if !constraints.allows_map(map) {
+            return self.invalidate();
+        }
+
         let range = constraints.clamp_address_range((self.address, map.get_to_address()));
 
         if let Some(hit) = signature.next(
-            &map.get_bytes()[range.0 - map.get_from_address()..range.1 - map.get_to_address()],
+            &map.get_bytes()[range.0 - map.get_from_address()..range.1 - map.get_from_address()],
         ) {
             self.address += hit;
             return self;

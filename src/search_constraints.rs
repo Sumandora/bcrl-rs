@@ -130,7 +130,7 @@ impl SearchConstraints {
             }
         }
 
-        if self.address_range.1 < map.get_from_address()
+        if self.address_range.0 > map.get_from_address()
             || self.address_range.1 < map.get_to_address()
         {
             return false;
