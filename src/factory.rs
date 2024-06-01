@@ -1,4 +1,4 @@
-use std::{collections::BinaryHeap, os::unix::fs::FileExt, rc::Rc};
+use std::{os::unix::fs::FileExt, rc::Rc};
 
 use procfs::{
     process::{MemoryMaps, Process},
@@ -33,7 +33,7 @@ impl BcrlFactory {
         mem_file: &File,
         capture_dynamic: bool,
     ) -> Result<Self, ProcError> {
-        let mut maps = BinaryHeap::new();
+        let mut maps = CachedMaps::new();
 
         for map in mappings {
             if !capture_dynamic && map.dev.0 == 0 {
@@ -46,7 +46,7 @@ impl BcrlFactory {
                 if length != size {
                     continue;
                 }
-                maps.push(CachedMap::new(
+                maps.insert(CachedMap::new(
                     map.address.0 as usize,
                     map.address.1 as usize,
                     map.perms,
