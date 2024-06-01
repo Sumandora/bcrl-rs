@@ -44,11 +44,19 @@ impl SafePointer {
     pub fn add(&mut self, operand: usize) -> &mut Self {
         self.address += operand;
 
+        if !self.is_valid(1) {
+            return self.invalidate();
+        }
+
         self
     }
 
     pub fn sub(&mut self, operand: usize) -> &mut Self {
         self.address -= operand;
+
+        if !self.is_valid(1) {
+            return self.invalidate();
+        }
 
         self
     }
@@ -59,6 +67,10 @@ impl SafePointer {
                 self.address = Endian::read_u64(bytes) as usize;
             } else {
                 self.address = Endian::read_u32(bytes) as usize;
+            }
+
+            if !self.is_valid(1) {
+                return self.invalidate();
             }
         } else {
             self.invalidate();
@@ -80,6 +92,10 @@ impl SafePointer {
                 Ordering::Greater => self.address += offset as usize,
                 Ordering::Less => self.address -= offset.unsigned_abs() as usize,
                 Ordering::Equal => {}
+            }
+
+            if !self.is_valid(1) {
+                return self.invalidate();
             }
         } else {
             self.invalidate();
