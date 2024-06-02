@@ -18,7 +18,7 @@ use signature_scanner::Signature;
 use procfs::process::Process;
 
 let process = Process::myself().unwrap();
-let factory = BcrlFactory::from_process(&process, false).unwrap();
+let factory = BcrlFactory::from_process(&process).unwrap();
 
 // Create with a signature;
 factory.signature(Signature::ida("12 34 56 78 90 AB CD EF"), SearchConstraints::everything());
