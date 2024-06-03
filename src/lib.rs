@@ -122,7 +122,7 @@ mod tests {
                     .thats_executable()
                     .thats_readable(),
             )
-            .get_pointer()
-            .is_ok());
+            .get_pool()
+            .count() > 0);
     }
 }
